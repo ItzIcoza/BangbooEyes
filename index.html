@@ -35,27 +35,43 @@
             box-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00;
             position: relative;
             overflow: hidden;
+            transition: height 0.1s;
         }
         .pupil {
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             background-color: #000;
             border-radius: 50%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            transition: transform 0.1s;
         }
         .controls {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
+            max-width: 400px;
         }
         button {
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
+        }
+        .color-picker, .size-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .color-picker label, .size-control label {
+            font-size: 16px;
+            min-width: 100px;
+        }
+        input[type="range"] {
+            width: 150px;
         }
     </style>
 </head>
@@ -69,10 +85,20 @@
         <button onclick="changeEmotion('sad')">Sad</button>
         <button onclick="changeEmotion('surprised')">Surprised</button>
         <button onclick="changeEmotion('neutral')">Neutral</button>
-        <button onclick="changeEyeColor('#ffff00')">Yellow Eyes</button>
-        <button onclick="changeEyeColor('#00ff00')">Green Eyes</button>
-        <button onclick="changeEyeColor('#ff00ff')">Pink Eyes</button>
-        <button onclick="changeEyeColor('#00ffff')">Cyan Eyes</button>
+        <div class="color-picker">
+            <label for="eyeColor">Eye Color:</label>
+            <input type="color" id="eyeColor" value="#ffff00" onchange="changeEyeColor(this.value)">
+        </div>
+        <div class="size-control">
+            <label for="eyeSize">Eye Size:</label>
+            <input type="range" id="eyeSize" min="20" max="60" value="40" onchange="changeEyeSize(this.value)">
+        </div>
+        <div class="size-control">
+            <label for="pupilSize">Pupil Size:</label>
+            <input type="range" id="pupilSize" min="5" max="30" value="20" onchange="changePupilSize(this.value)">
+        </div>
+        <button id="blinkToggle" onclick="toggleBlinking()">Turn Blinking On</button>
+        <button id="eyeFollowToggle" onclick="toggleEyeFollowing()">Disable Eye Following</button>
     </div>
 
     <script>
@@ -81,9 +107,16 @@
         const rightEye = document.getElementById('rightEye');
         const leftPupil = document.getElementById('leftPupil');
         const rightPupil = document.getElementById('rightPupil');
+        const blinkToggleBtn = document.getElementById('blinkToggle');
+        const eyeFollowToggleBtn = document.getElementById('eyeFollowToggle');
 
-        // Interactive eyes
-        document.addEventListener('mousemove', (e) => {
+        let isBlinking = false;
+        let isEyeFollowing = true;
+        let blinkInterval;
+
+        function updateEyePosition(e) {
+            if (!isEyeFollowing) return;
+
             const bangbooRect = bangboo.getBoundingClientRect();
             const bangbooCenterX = bangbooRect.left + bangbooRect.width / 2;
             const bangbooCenterY = bangbooRect.top + bangbooRect.height / 2;
@@ -94,7 +127,10 @@
             const maxMove = 5;
             leftPupil.style.transform = `translate(-50%, -50%) translate(${Math.cos(angleLeft) * maxMove}px, ${Math.sin(angleLeft) * maxMove}px)`;
             rightPupil.style.transform = `translate(-50%, -50%) translate(${Math.cos(angleRight) * maxMove}px, ${Math.sin(angleRight) * maxMove}px)`;
-        });
+        }
+
+        // Interactive eyes
+        document.addEventListener('mousemove', updateEyePosition);
 
         function changeEmotion(emotion) {
             switch(emotion) {
@@ -129,6 +165,51 @@
             rightEye.style.backgroundColor = color;
             leftEye.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
             rightEye.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
+        }
+
+        function changeEyeSize(size) {
+            leftEye.style.width = `${size}px`;
+            leftEye.style.height = `${size}px`;
+            rightEye.style.width = `${size}px`;
+            rightEye.style.height = `${size}px`;
+        }
+
+        function changePupilSize(size) {
+            leftPupil.style.width = `${size}px`;
+            leftPupil.style.height = `${size}px`;
+            rightPupil.style.width = `${size}px`;
+            rightPupil.style.height = `${size}px`;
+        }
+
+        function blink() {
+            leftEye.style.height = '1px';
+            rightEye.style.height = '1px';
+            setTimeout(() => {
+                leftEye.style.height = '';
+                rightEye.style.height = '';
+            }, 150);
+        }
+
+        function toggleBlinking() {
+            isBlinking = !isBlinking;
+            if (isBlinking) {
+                blinkInterval = setInterval(blink, 3000);
+                blinkToggleBtn.textContent = 'Turn Blinking Off';
+            } else {
+                clearInterval(blinkInterval);
+                blinkToggleBtn.textContent = 'Turn Blinking On';
+            }
+        }
+
+        function toggleEyeFollowing() {
+            isEyeFollowing = !isEyeFollowing;
+            if (!isEyeFollowing) {
+                leftPupil.style.transform = 'translate(-50%, -50%)';
+                rightPupil.style.transform = 'translate(-50%, -50%)';
+                eyeFollowToggleBtn.textContent = 'Enable Eye Following';
+            } else {
+                eyeFollowToggleBtn.textContent = 'Disable Eye Following';
+            }
         }
     </script>
 </body>
