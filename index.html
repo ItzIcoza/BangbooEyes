@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Bangboo</title>
+    <style>
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .bangboo {
+            width: 200px;
+            height: 100px;
+            background-color: #555;
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+        }
+        .eye {
+            width: 40px;
+            height: 40px;
+            background-color: #ffff00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00;
+            position: relative;
+            overflow: hidden;
+        }
+        .pupil {
+            width: 20px;
+            height: 20px;
+            background-color: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="bangboo" id="bangboo">
+        <div class="eye" id="leftEye"><div class="pupil" id="leftPupil"></div></div>
+        <div class="eye" id="rightEye"><div class="pupil" id="rightPupil"></div></div>
+    </div>
+
+    <script>
+        const bangboo = document.getElementById('bangboo');
+        const leftEye = document.getElementById('leftEye');
+        const rightEye = document.getElementById('rightEye');
+        const leftPupil = document.getElementById('leftPupil');
+        const rightPupil = document.getElementById('rightPupil');
+
+        // Interactive eyes
+        document.addEventListener('mousemove', (e) => {
+            const bangbooRect = bangboo.getBoundingClientRect();
+            const bangbooCenterX = bangbooRect.left + bangbooRect.width / 2;
+            const bangbooCenterY = bangbooRect.top + bangbooRect.height / 2;
+
+            const angleLeft = Math.atan2(e.clientY - bangbooCenterY, e.clientX - (bangbooRect.left + bangbooRect.width / 4));
+            const angleRight = Math.atan2(e.clientY - bangbooCenterY, e.clientX - (bangbooRect.left + 3 * bangbooRect.width / 4));
+
+            const maxMove = 5;
+            leftPupil.style.transform = `translate(-50%, -50%) translate(${Math.cos(angleLeft) * maxMove}px, ${Math.sin(angleLeft) * maxMove}px)`;
+            rightPupil.style.transform = `translate(-50%, -50%) translate(${Math.cos(angleRight) * maxMove}px, ${Math.sin(angleRight) * maxMove}px)`;
+        });
+
+        function changeEmotion(emotion) {
+            switch(emotion) {
+                case 'happy':
+                    leftEye.style.borderRadius = '50% 50% 0 0';
+                    rightEye.style.borderRadius = '50% 50% 0 0';
+                    leftEye.style.height = '30px';
+                    rightEye.style.height = '30px';
+                    break;
+                case 'sad':
+                    leftEye.style.borderRadius = '0 0 50% 50%';
+                    rightEye.style.borderRadius = '0 0 50% 50%';
+                    leftEye.style.height = '30px';
+                    rightEye.style.height = '30px';
+                    break;
+                case 'surprised':
+                    leftEye.style.borderRadius = '50%';
+                    rightEye.style.borderRadius = '50%';
+                    leftEye.style.height = '50px';
+                    rightEye.style.height = '50px';
+                    break;
+                default:
+                    leftEye.style.borderRadius = '50%';
+                    rightEye.style.borderRadius = '50%';
+                    leftEye.style.height = '40px';
+                    rightEye.style.height = '40px';
+            }
+        }
+
+        // You can call changeEmotion() to test different emotions
+        // For example: changeEmotion('happy');
+    </script>
+</body>
+</html>
