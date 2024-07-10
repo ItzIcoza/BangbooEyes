@@ -6,13 +6,15 @@
     <title>Interactive Bangboo</title>
     <style>
         body {
-            background-color: #333;
+            background-color: #000000;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
+            color: white;
         }
         .bangboo {
             width: 200px;
@@ -23,6 +25,7 @@
             justify-content: space-around;
             align-items: center;
             position: relative;
+            margin-bottom: 20px;
         }
         .eye {
             width: 40px;
@@ -43,12 +46,33 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="bangboo" id="bangboo">
         <div class="eye" id="leftEye"><div class="pupil" id="leftPupil"></div></div>
         <div class="eye" id="rightEye"><div class="pupil" id="rightPupil"></div></div>
+    </div>
+    <div class="controls">
+        <button onclick="changeEmotion('happy')">Happy</button>
+        <button onclick="changeEmotion('sad')">Sad</button>
+        <button onclick="changeEmotion('surprised')">Surprised</button>
+        <button onclick="changeEmotion('neutral')">Neutral</button>
+        <button onclick="changeEyeColor('#ffff00')">Yellow Eyes</button>
+        <button onclick="changeEyeColor('#00ff00')">Green Eyes</button>
+        <button onclick="changeEyeColor('#ff00ff')">Pink Eyes</button>
+        <button onclick="changeEyeColor('#00ffff')">Cyan Eyes</button>
     </div>
 
     <script>
@@ -100,8 +124,12 @@
             }
         }
 
-        // You can call changeEmotion() to test different emotions
-        // For example: changeEmotion('happy');
+        function changeEyeColor(color) {
+            leftEye.style.backgroundColor = color;
+            rightEye.style.backgroundColor = color;
+            leftEye.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
+            rightEye.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
+        }
     </script>
 </body>
 </html>
