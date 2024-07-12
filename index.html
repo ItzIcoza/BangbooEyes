@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Bangboo</title>
+    <title>Interactive Bangboo Eyes</title>
     <style>
         body {
             background-color: #000000;
@@ -11,10 +12,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
             color: white;
+            transition: background-color 0.5s;
         }
         .bangboo {
             width: 200px;
@@ -35,7 +37,7 @@
             box-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00;
             position: relative;
             overflow: hidden;
-            transition: height 0.1s;
+            transition: all 0.3s;
         }
         .pupil {
             width: 20px;
@@ -48,57 +50,95 @@
             transform: translate(-50%, -50%);
             transition: transform 0.1s;
         }
+        .reflection {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            position: absolute;
+            top: 20%;
+            left: 20%;
+        }
         .controls {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
-            max-width: 400px;
+            max-width: 600px;
+            margin-top: 20px;
         }
-        button {
+        button, input, select {
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
         }
-        .color-picker, .size-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 5px 0;
+        .pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+            mix-blend-mode: overlay;
         }
-        .color-picker label, .size-control label {
-            font-size: 16px;
-            min-width: 100px;
-        }
-        input[type="range"] {
-            width: 150px;
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="bangboo" id="bangboo">
-        <div class="eye" id="leftEye"><div class="pupil" id="leftPupil"></div></div>
-        <div class="eye" id="rightEye"><div class="pupil" id="rightPupil"></div></div>
+        <div class="eye" id="leftEye">
+            <div class="pupil" id="leftPupil"></div>
+            <div class="reflection"></div>
+            <div class="pattern" id="leftPattern"></div>
+        </div>
+        <div class="eye" id="rightEye">
+            <div class="pupil" id="rightPupil"></div>
+            <div class="reflection"></div>
+            <div class="pattern" id="rightPattern"></div>
+        </div>
     </div>
     <div class="controls">
-        <button onclick="changeEmotion('happy')">Happy</button>
-        <button onclick="changeEmotion('sad')">Sad</button>
-        <button onclick="changeEmotion('surprised')">Surprised</button>
-        <button onclick="changeEmotion('neutral')">Neutral</button>
-        <div class="color-picker">
+        <button onclick="changeEmotion('happy')" aria-label="Set happy expression">Happy</button>
+        <button onclick="changeEmotion('sad')" aria-label="Set sad expression">Sad</button>
+        <button onclick="changeEmotion('surprised')" aria-label="Set surprised expression">Surprised</button>
+        <button onclick="changeEmotion('neutral')" aria-label="Set neutral expression">Neutral</button>
+        <div>
             <label for="eyeColor">Eye Color:</label>
-            <input type="color" id="eyeColor" value="#ffff00" onchange="changeEyeColor(this.value)">
+            <input type="color" id="eyeColor" value="#ffff00" onchange="changeEyeColor(this.value)" aria-label="Change eye color">
         </div>
-        <div class="size-control">
+        <div>
             <label for="eyeSize">Eye Size:</label>
-            <input type="range" id="eyeSize" min="20" max="60" value="40" onchange="changeEyeSize(this.value)">
+            <input type="range" id="eyeSize" min="20" max="60" value="40" onchange="changeEyeSize(this.value)" aria-label="Change eye size">
         </div>
-        <div class="size-control">
+        <div>
             <label for="pupilSize">Pupil Size:</label>
-            <input type="range" id="pupilSize" min="5" max="30" value="20" onchange="changePupilSize(this.value)">
+            <input type="range" id="pupilSize" min="5" max="30" value="20" onchange="changePupilSize(this.value)" aria-label="Change pupil size">
         </div>
-        <button id="blinkToggle" onclick="toggleBlinking()">Turn Blinking On</button>
-        <button id="eyeFollowToggle" onclick="toggleEyeFollowing()">Disable Eye Following</button>
+        <div>
+            <label for="emotionIntensity">Emotion Intensity:</label>
+            <input type="range" id="emotionIntensity" min="0" max="100" value="50" onchange="changeEmotionIntensity(this.value)" aria-label="Change emotion intensity">
+        </div>
+        <button id="blinkToggle" onclick="toggleBlinking()" aria-label="Toggle blinking">Turn Blinking On</button>
+        <button id="eyeFollowToggle" onclick="toggleEyeFollowing()" aria-label="Toggle eye following">Disable Eye Following</button>
+        <button onclick="randomize()" aria-label="Randomize appearance">Randomize</button>
+        <button onclick="toggleDayNight()" aria-label="Toggle day/night mode">Toggle Day/Night</button>
+        <button onclick="wink()" aria-label="Wink">Wink</button>
+        <select id="patternSelect" onchange="changePattern(this.value)" aria-label="Select eye pattern">
+            <option value="none">No Pattern</option>
+            <option value="swirl">Swirl</option>
+            <option value="stars">Stars</option>
+        </select>
+        <input type="color" id="bgColor" value="#000000" onchange="changeBackground(this.value)" aria-label="Change background color">
+        <button onclick="saveConfig()" aria-label="Save current configuration">Save Config</button>
+        <button onclick="loadConfig()" aria-label="Load saved configuration">Load Config</button>
+        <button onclick="resetConfig()" aria-label="Reset configuration">Reset Config</button>
+        <button onclick="renderToPNG()" aria-label="Render to PNG">Render to PNG</button>
+        <button onclick="shareConfig()" aria-label="Share configuration">Share Config</button>
     </div>
 
     <script>
@@ -109,78 +149,169 @@
         const rightPupil = document.getElementById('rightPupil');
         const blinkToggleBtn = document.getElementById('blinkToggle');
         const eyeFollowToggleBtn = document.getElementById('eyeFollowToggle');
-
+    
         let isBlinking = false;
         let isEyeFollowing = true;
         let blinkInterval;
+        let currentEmotion = 'neutral';
 
+        function renderToPNG() {
+    // Temporarily disable eye following
+    const wasFollowing = isEyeFollowing;
+    if (isEyeFollowing) {
+        toggleEyeFollowing();
+    }
+
+    // Use html2canvas to render the Bangboo
+    html2canvas(document.querySelector("#bangboo")).then(canvas => {
+        // Convert canvas to PNG data URL
+        const imgData = canvas.toDataURL("image/png");
+        
+        // Create a temporary link element and trigger download
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = 'bangboo.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Re-enable eye following if it was enabled before
+        if (wasFollowing) {
+            toggleEyeFollowing();
+        }
+    });
+}
+
+function shareConfig() {
+    const config = {
+        eyeColor: document.getElementById('eyeColor').value,
+        eyeSize: document.getElementById('eyeSize').value,
+        pupilSize: document.getElementById('pupilSize').value,
+        emotion: currentEmotion,
+        pattern: document.getElementById('patternSelect').value,
+        bgColor: document.getElementById('bgColor').value,
+        emotionIntensity: document.getElementById('emotionIntensity').value
+    };
+    const configString = btoa(JSON.stringify(config)); // Encode the config to base64
+    const shareUrl = `${window.location.origin}${window.location.pathname}?config=${configString}`;
+    
+    // Create a temporary input to copy the URL
+    const tempInput = document.createElement("input");
+    document.body.appendChild(tempInput);
+    tempInput.value = shareUrl;
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    
+    alert("Configuration URL copied to clipboard!");
+}
+
+function resetConfig() {
+    // Clear local storage
+    localStorage.removeItem('bangbooConfig');
+    
+    // Re-initialize Bangboo with default settings
+    initializeBangboo();
+    
+    alert('Configuration has been reset to default!');
+}
+
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedConfig = urlParams.get('config');
+    if (sharedConfig) {
+        const config = JSON.parse(atob(sharedConfig));
+        loadConfigFromObject(config);
+    } else {
+        initializeBangboo();
+    }
+};
+
+function loadConfigFromObject(config) {
+    changeEyeColor(config.eyeColor);
+    changeEyeSize(config.eyeSize);
+    changePupilSize(config.pupilSize);
+    changeEmotion(config.emotion);
+    changePattern(config.pattern);
+    changeBackground(config.bgColor);
+    changeEmotionIntensity(config.emotionIntensity);
+    
+    document.getElementById('eyeColor').value = config.eyeColor;
+    document.getElementById('eyeSize').value = config.eyeSize;
+    document.getElementById('pupilSize').value = config.pupilSize;
+    document.getElementById('patternSelect').value = config.pattern;
+    document.getElementById('bgColor').value = config.bgColor;
+    document.getElementById('emotionIntensity').value = config.emotionIntensity;
+}
+    
         function updateEyePosition(e) {
             if (!isEyeFollowing) return;
-
+    
             const bangbooRect = bangboo.getBoundingClientRect();
             const bangbooCenterX = bangbooRect.left + bangbooRect.width / 2;
             const bangbooCenterY = bangbooRect.top + bangbooRect.height / 2;
-
+    
             const angleLeft = Math.atan2(e.clientY - bangbooCenterY, e.clientX - (bangbooRect.left + bangbooRect.width / 4));
             const angleRight = Math.atan2(e.clientY - bangbooCenterY, e.clientX - (bangbooRect.left + 3 * bangbooRect.width / 4));
-
+    
             const maxMove = 5;
             leftPupil.style.transform = `translate(-50%, -50%) translate(${Math.cos(angleLeft) * maxMove}px, ${Math.sin(angleLeft) * maxMove}px)`;
             rightPupil.style.transform = `translate(-50%, -50%) translate(${Math.cos(angleRight) * maxMove}px, ${Math.sin(angleRight) * maxMove}px)`;
         }
-
-        // Interactive eyes
+    
         document.addEventListener('mousemove', updateEyePosition);
-
+    
         function changeEmotion(emotion) {
-            switch(emotion) {
-                case 'happy':
-                    leftEye.style.borderRadius = '50% 50% 0 0';
-                    rightEye.style.borderRadius = '50% 50% 0 0';
-                    leftEye.style.height = '30px';
-                    rightEye.style.height = '30px';
-                    break;
-                case 'sad':
-                    leftEye.style.borderRadius = '0 0 50% 50%';
-                    rightEye.style.borderRadius = '0 0 50% 50%';
-                    leftEye.style.height = '30px';
-                    rightEye.style.height = '30px';
-                    break;
-                case 'surprised':
-                    leftEye.style.borderRadius = '50%';
-                    rightEye.style.borderRadius = '50%';
-                    leftEye.style.height = '50px';
-                    rightEye.style.height = '50px';
-                    break;
-                default:
-                    leftEye.style.borderRadius = '50%';
-                    rightEye.style.borderRadius = '50%';
-                    leftEye.style.height = '40px';
-                    rightEye.style.height = '40px';
-            }
-        }
-
+    currentEmotion = emotion;
+    switch(emotion) {
+        case 'happy':
+            leftEye.style.borderRadius = '50% 50% 0 0';
+            rightEye.style.borderRadius = '50% 50% 0 0';
+            leftEye.style.height = '30px';
+            rightEye.style.height = '30px';
+            break;
+        case 'sad':
+            leftEye.style.borderRadius = '0 0 50% 50%';
+            rightEye.style.borderRadius = '0 0 50% 50%';
+            leftEye.style.height = '30px';
+            rightEye.style.height = '30px';
+            break;
+        case 'surprised':
+            leftEye.style.borderRadius = '50%';
+            rightEye.style.borderRadius = '50%';
+            leftEye.style.height = '50px';
+            rightEye.style.height = '50px';
+            break;
+        case 'neutral':
+        default:
+            leftEye.style.borderRadius = '50%';
+            rightEye.style.borderRadius = '50%';
+            leftEye.style.height = '40px';
+            rightEye.style.height = '40px';
+    }
+}
+    
         function changeEyeColor(color) {
             leftEye.style.backgroundColor = color;
             rightEye.style.backgroundColor = color;
             leftEye.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
             rightEye.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
         }
-
+    
         function changeEyeSize(size) {
             leftEye.style.width = `${size}px`;
             leftEye.style.height = `${size}px`;
             rightEye.style.width = `${size}px`;
             rightEye.style.height = `${size}px`;
         }
-
+    
         function changePupilSize(size) {
             leftPupil.style.width = `${size}px`;
             leftPupil.style.height = `${size}px`;
             rightPupil.style.width = `${size}px`;
             rightPupil.style.height = `${size}px`;
         }
-
+    
         function blink() {
             leftEye.style.height = '1px';
             rightEye.style.height = '1px';
@@ -189,7 +320,7 @@
                 rightEye.style.height = '';
             }, 150);
         }
-
+    
         function toggleBlinking() {
             isBlinking = !isBlinking;
             if (isBlinking) {
@@ -200,7 +331,7 @@
                 blinkToggleBtn.textContent = 'Turn Blinking On';
             }
         }
-
+    
         function toggleEyeFollowing() {
             isEyeFollowing = !isEyeFollowing;
             if (!isEyeFollowing) {
@@ -211,6 +342,130 @@
                 eyeFollowToggleBtn.textContent = 'Disable Eye Following';
             }
         }
+    
+        // ... (previous code remains the same)
+
+        function initializeBangboo() {
+    // Set default values
+    changeEyeColor('#ffff00');  // Yellow eyes
+    changeEyeSize(40);
+    changePupilSize(20);
+    changeEmotion('neutral');
+    changePattern('none');
+    changeBackground('#000000');  // Black background
+    changeEmotionIntensity(50);
+
+    // Ensure eyes are round
+    leftEye.style.borderRadius = '50%';
+    rightEye.style.borderRadius = '50%';
+
+    // Update input elements to reflect default values
+    document.getElementById('eyeColor').value = '#ffff00';
+    document.getElementById('eyeSize').value = 40;
+    document.getElementById('pupilSize').value = 20;
+    document.getElementById('patternSelect').value = 'none';
+    document.getElementById('bgColor').value = '#000000';
+    document.getElementById('emotionIntensity').value = 50;
+    }
+
+    // Ensure the page is responsive
+    window.addEventListener('resize', function() {
+        // Adjust sizes or layout if necessary
+    });
+
+// Initialize with default configuration
+    initializeBangboo();
+
+// Optional: Load saved configuration if available
+    if (localStorage.getItem('bangbooConfig')) {
+        loadConfig();
+        }
+    
+        function toggleDayNight() {
+            const body = document.body;
+            body.style.backgroundColor = body.style.backgroundColor === 'rgb(255, 255, 255)' ? '#000000' : '#ffffff';
+            body.style.color = body.style.color === 'rgb(0, 0, 0)' ? '#ffffff' : '#000000';
+        }
+    
+        function changePattern(pattern) {
+            const leftPattern = document.getElementById('leftPattern');
+            const rightPattern = document.getElementById('rightPattern');
+            switch(pattern) {
+                case 'swirl':
+                    leftPattern.style.backgroundImage = 'conic-gradient(from 0deg, red, yellow, green, blue, purple, red)';
+                    rightPattern.style.backgroundImage = 'conic-gradient(from 0deg, red, yellow, green, blue, purple, red)';
+                    break;
+                case 'stars':
+                    leftPattern.style.backgroundImage = 'radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px), radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px), radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px)';
+                    rightPattern.style.backgroundImage = 'radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px), radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px), radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px)';
+                    break;
+                default:
+                    leftPattern.style.backgroundImage = 'none';
+                    rightPattern.style.backgroundImage = 'none';
+            }
+        }
+    
+        function changeBackground(color) {
+            document.body.style.backgroundColor = color;
+        }
+    
+        function wink() {
+            const leftEye = document.getElementById('leftEye');
+            leftEye.style.height = '1px';
+            setTimeout(() => {
+                leftEye.style.height = '';
+            }, 300);
+        }
+    
+        function changeEmotionIntensity(intensity) {
+            const value = intensity / 100;
+            leftEye.style.borderRadius = `${50 * value}% ${50 * value}% ${50 * (1-value)}% ${50 * (1-value)}%`;
+            rightEye.style.borderRadius = `${50 * value}% ${50 * value}% ${50 * (1-value)}% ${50 * (1-value)}%`;
+        }
+    
+        function saveConfig() {
+            const config = {
+                eyeColor: document.getElementById('eyeColor').value,
+                eyeSize: document.getElementById('eyeSize').value,
+                pupilSize: document.getElementById('pupilSize').value,
+                emotion: currentEmotion,
+                pattern: document.getElementById('patternSelect').value,
+                bgColor: document.getElementById('bgColor').value,
+                emotionIntensity: document.getElementById('emotionIntensity').value
+            };
+            localStorage.setItem('bangbooConfig', JSON.stringify(config));
+            alert('Configuration saved!');
+        }
+    
+        function loadConfig() {
+            const config = JSON.parse(localStorage.getItem('bangbooConfig'));
+            if (config) {
+                changeEyeColor(config.eyeColor);
+                changeEyeSize(config.eyeSize);
+                changePupilSize(config.pupilSize);
+                changeEmotion(config.emotion);
+                changePattern(config.pattern);
+                changeBackground(config.bgColor);
+                changeEmotionIntensity(config.emotionIntensity);
+                document.getElementById('eyeColor').value = config.eyeColor;
+                document.getElementById('eyeSize').value = config.eyeSize;
+                document.getElementById('pupilSize').value = config.pupilSize;
+                document.getElementById('patternSelect').value = config.pattern;
+                document.getElementById('bgColor').value = config.bgColor;
+                document.getElementById('emotionIntensity').value = config.emotionIntensity;
+                alert('Configuration loaded!');
+            } else {
+                alert('No saved configuration found.');
+            }
+        }
+    
+        // Ensure the page is responsive
+        window.addEventListener('resize', function() {
+            // Adjust sizes or layout if necessary
+        });
+    
+        // Initialize
+        randomize();
     </script>
 </body>
 </html>
